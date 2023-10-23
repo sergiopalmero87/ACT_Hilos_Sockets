@@ -11,9 +11,7 @@ Las películas tendrán un ID, un título, un director y un precio. Se encontrar
 
 La aplicación cliente mostrará un menú como el que sigue:
 
-Consultar película por ID
-Consultar película por título
-Salir de la aplicación
+Consultar película por ID ,consultar película por título y salir de la aplicación.
 La aplicación se ejecutará hasta que el cliente decida pulsar la opción de “salir de la aplicación”.
 
 El cliente deberá de recoger todos los datos del usuario necesarios y mandarlos al servidor en un solo envío.
