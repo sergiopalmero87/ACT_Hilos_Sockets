@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 public class Cliente {
 
-    public static final int PUERTO = 12346;
+    public static final int PUERTO = 12345;
     public static final String IP_SERVER = "LocalHost";
 
     public static void main(String[] args) throws IOException {
@@ -34,6 +34,7 @@ public class Cliente {
             //Procesamos los datos que nos manda el servidor
             BufferedReader entradaBuffer = new BufferedReader(entrada);
 
+
             boolean continuar = true;
             do {
                 String opcion;
@@ -48,23 +49,21 @@ public class Cliente {
                 System.out.println("-----------------------------");
 
                 opcion = sc.nextLine();
-                String texto;
-                switch (opcion){
+                String consulta;
 
+
+                switch (opcion){
                     case "1":
-                        System.out.println("Escribe el id: ");
-                        texto = sc.nextLine();
-                        salida.println(texto);
+                        System.out.println("Consulta por ID:");
+                        salida.println(opcion);
                         break;
                     case "2":
-                        System.out.println("Escribe el titulo: ");
-                        texto = sc.nextLine();
-                        salida.println(texto);
+                        System.out.println("Consulta por titulo: ");
+                        salida.println(opcion);
                         break;
                     case "3":
-                        System.out.println("Escribe el Nombre del director: ");
-                        texto = sc.nextLine();
-                        salida.println(texto);
+                        System.out.println("Consulta por nombre del director: ");
+                        salida.println(opcion);
                         break;
                     case "4":
                         System.out.println("Escribe los datos para añadir una nueva pelicula");
@@ -77,12 +76,14 @@ public class Cliente {
                         String nombreDirector = sc.nextLine();
                         System.out.println("Precio: ");
                         double precio = sc.nextDouble();
-                        texto = sc.nextLine();
-                        salida.println(texto);
+                        consulta = sc.nextLine();
+                        salida.println(consulta);
                     case "5":
-                        opcion = sc.nextLine();
                         salida.println(opcion);
                         continuar = false;
+                        break;
+                    default:
+                        System.out.println("Opción no válida. Por favor, introduce una opción entre 1 y 5.");
                         break;
                 }
 

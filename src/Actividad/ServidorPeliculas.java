@@ -14,7 +14,7 @@ public class ServidorPeliculas {
     String titulo, nombreDirector;
     double precio;
 
-    public static final int PUERTO = 12346;
+    public static final int PUERTO = 12345;
 
     static List<ServidorPeliculas> listaPeliculas = new ArrayList<>();
 
