@@ -4,7 +4,6 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 
 import static Actividad.ServidorPeliculas.listaPeliculas;
@@ -26,7 +25,7 @@ public class Hilo implements Runnable {
     @Override
     public void run() {
 
-        System.out.println("Estableciendo conexion con cliente " + hilo.getName());
+        System.out.println("Conexion establecida con el cliente " + hilo.getName());
 
         InputStreamReader entradaDelCliente;
         BufferedReader bufferCliente;
@@ -42,29 +41,43 @@ public class Hilo implements Runnable {
             //Le enviamos los datos al cliente
             salidaAlCliente = new PrintStream(socketAlCliente.getOutputStream());
 
-            String textoDelCliente = "";
-            String respuesta = "";
+            String opcionDelCliente = "";
             boolean continuar = true;
 
             //Procesamos entradas hasta que el texto sea 5.
             while (continuar){
-                textoDelCliente = bufferCliente.readLine();
-
-                if (textoDelCliente.trim().equals("5")){
+                opcionDelCliente = bufferCliente.readLine();
+                //Si la opcion del cliente es 5 entonces se cierra la comunicacion.
+                if (opcionDelCliente.trim().equals("5")){
                     salidaAlCliente.println("Fin del programa");
                     System.out.println(hilo.getName() + " ha cerrado la comunicacion");
                     continuar = false;
                 } else {
-                    switch (textoDelCliente){
+                    //Si no, el cliente manda la opcion y entra en el switch.
+                    //Entonces el cliente manda la consulta que se procesa con el bufferedReader.
+                    String consultaCliente = "";
+                    consultaCliente = bufferCliente.readLine();
+                    switch (opcionDelCliente){
                         case "1":
-                            respuesta = getPeliculaByTitle(textoDelCliente).toString();
-                            salidaAlCliente.println(respuesta);
+                            System.out.println("Consulta por id aceptada. Respuesta enviada"); //Este mensaje se muestra en el servidor
+                            getPeliculaById(consultaCliente, salidaAlCliente);
+                            break;
                         case "2":
-                            getPeliculaByTitle(textoDelCliente);
+                            System.out.println("Consulta por titulo aceptada. Respuesta enviada");
+                            getPeliculaByTitle(consultaCliente, salidaAlCliente);
+                            break;
                         case "3":
-                            getPeliculaByDirectorName(textoDelCliente);
+                            System.out.println("Consulta por director aceptada. Respuesta enviada");
+                            buscarPorDirector(consultaCliente, salidaAlCliente);
+                            break;
                         case "4":
-                            addPelicula();
+                            System.out.println("Consulta para añadir nueva película aceptada. Respuesta enviada");
+                            int id = Integer.parseInt(bufferCliente.readLine());
+                            String titulo = bufferCliente.readLine();
+                            String nombreDirector = bufferCliente.readLine();
+                            double precio = Double.parseDouble(bufferCliente.readLine());
+                            addPelicula(id, titulo, nombreDirector, precio, salidaAlCliente);
+                            break;
                         default:
                             salidaAlCliente.println("Error. Numero de consulta incorrecto.");
                     }
@@ -76,58 +89,58 @@ public class Hilo implements Runnable {
         }catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        }
+    }
 
     //Logica para responder al cliente
-    public String getPeliculaById(String textoCliente){
-        for (ServidorPeliculas p : listaPeliculas){
-            if (String.valueOf(p.id).equals(textoCliente)){
-                System.out.println(p);
+
+    //Funciones para buscar peliculas dentro de la lista.
+    //Reciben dos parametros: El dato a consultar y la salida hacia el cliente.
+    private synchronized void getPeliculaById(String idConsulta, PrintStream salidaAlCliente) {
+        for (ServidorPeliculas p : listaPeliculas) {
+            if (String.valueOf(p.id).equals(idConsulta)) {
+                salidaAlCliente.println(p);
+                return; // Salir del bucle una vez que se encuentra una coincidencia.
             }
         }
-        return "No encontrado";
+        salidaAlCliente.println("No se encontró ninguna película con el ID especificado");
     }
 
-    public String getPeliculaByTitle(String textoCliente) {
+    private synchronized void getPeliculaByTitle(String tituloConsulta, PrintStream salidaAlCliente) {
         List<ServidorPeliculas> peliculas = new ArrayList<>();
         for (ServidorPeliculas p : listaPeliculas) {
-            if (textoCliente.equalsIgnoreCase(p.titulo)) {
+            if (p.titulo.equalsIgnoreCase(tituloConsulta)) {
                 peliculas.add(p);
-                System.out.println(p);
             }
         }
-        // Si no se encontró ninguna película, envía un mensaje al cliente.
         if (peliculas.isEmpty()) {
-            System.out.println("No se encontró ninguna película con el título especificado");
-            return null;
+            salidaAlCliente.println("No se encontró ninguna película con el título especificado");
+        } else {
+            salidaAlCliente.println(peliculas);
         }
-        // Devuelve la lista de películas encontradas.
-        return peliculas.toString();
     }
 
-    public String getPeliculaByDirectorName(String textoCliente) {
+
+    private synchronized void buscarPorDirector(String directorConsulta, PrintStream salidaAlCliente) {
         List<ServidorPeliculas> peliculasDirector = new ArrayList<>();
         for (ServidorPeliculas p : listaPeliculas) {
-            if (textoCliente.equalsIgnoreCase(p.nombreDirector)) {
+            if (directorConsulta.equalsIgnoreCase(p.nombreDirector)) {
                 peliculasDirector.add(p);
             }
         }
-
-        // Si no se encontró ninguna película, envía un mensaje al cliente.
         if (peliculasDirector.isEmpty()) {
-            System.out.println("No se encontró ninguna película con el nombre de director especificado");
-            return null;
+            salidaAlCliente.println("No se encontró ninguna película con el nombre del director especificado");
+        } else {
+            salidaAlCliente.println(peliculasDirector);
         }
-        return peliculasDirector.toString();
     }
 
-    private String addPelicula() {
-        ServidorPeliculas nuevaPelicula = new ServidorPeliculas();
+    private synchronized void addPelicula(int id, String titulo, String nombreDirector, double precio, PrintStream salidaAlCliente) {
+        ServidorPeliculas nuevaPelicula = new ServidorPeliculas(id, titulo, nombreDirector, precio);
         listaPeliculas.add(nuevaPelicula);
-        System.out.println("La pelicula " + nuevaPelicula + " se ha añadido");
-        return listaPeliculas.toString();
-
+        salidaAlCliente.println("La película se ha añadido con éxito:");
+        salidaAlCliente.println(listaPeliculas.toString());
     }
+
+
 
 }

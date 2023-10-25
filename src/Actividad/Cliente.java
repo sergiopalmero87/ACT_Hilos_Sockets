@@ -56,28 +56,45 @@ public class Cliente {
                     case "1":
                         System.out.println("Consulta por ID:");
                         salida.println(opcion);
+                        System.out.println("Escribe el id: ");
+                        consulta = sc.nextLine();
+                        salida.println(consulta);
                         break;
                     case "2":
                         System.out.println("Consulta por titulo: ");
                         salida.println(opcion);
+                        System.out.println("Escribe el titulo: ");
+                        consulta = sc.nextLine();
+                        salida.println(consulta);
                         break;
                     case "3":
                         System.out.println("Consulta por nombre del director: ");
                         salida.println(opcion);
+                        System.out.println("Escribe el nombre del director: ");
+                        consulta = sc.nextLine();
+                        salida.println(consulta);
                         break;
                     case "4":
                         System.out.println("Escribe los datos para añadir una nueva pelicula");
                         System.out.println("ID: ");
-                        int id = sc.nextInt();
+                        String id = sc.nextLine();
+                        salida.println(id);
+
                         System.out.println("Titulo: ");
                         String titulo = sc.nextLine();
-                        sc.nextLine();
+                        salida.println(titulo);
+                         //Para saltar de linea y acceder al siguente scanner.
+
                         System.out.println("Nombre del director: ");
                         String nombreDirector = sc.nextLine();
+                        salida.println(nombreDirector);
+
+
                         System.out.println("Precio: ");
-                        double precio = sc.nextDouble();
-                        consulta = sc.nextLine();
-                        salida.println(consulta);
+                        String precio = sc.nextLine();
+                        salida.println(precio);
+                        sc.nextLine();
+
                     case "5":
                         salida.println(opcion);
                         continuar = false;
